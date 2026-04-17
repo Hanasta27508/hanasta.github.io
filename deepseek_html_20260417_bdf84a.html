@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>GTopup+ Pro - Top Up Game Overdrive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --bg-dark: #0a0c12;
+            --bg-card: #141b2b;
+            --border: #252e42;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text: #eef2ff;
+        }
+
+        body {
+            background: linear-gradient(145deg, var(--bg-dark) 0%, #12151e 100%);
+            color: var(--text);
+            padding-bottom: 80px;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(10,12,18,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c084fc, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .referral-badge {
+            background: rgba(245,158,11,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid var(--warning);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(145deg, #fff, #94a3f8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Search & Filter */
+        .search-section {
+            max-width: 1300px;
+            margin: 1rem auto;
+            padding: 0 1.5rem;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 280px;
+            padding: 10px 18px;
+            background: #1a1f30;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            color: white;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background: #141b2b;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 1300px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 0.8rem;
+            text-align: center;
+            width: 120px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+
+        .game-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(59,130,246,0.4);
+        }
+
+        .game-card img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        /* Order Container */
+        .order-container {
+            max-width: 750px;
+            margin: 1rem auto;
+            background: var(--bg-card);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: #9ca3af;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #1a1f30;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: white;
+        }
+
+        .price-tag {
+            background: #0a0e18;
+            padding: 0.8rem;
+            border-radius: 20px;
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .pay-methods {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .pay-option {
+            background: #1a1f30;
+            padding: 0.6rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+
+        .pay-option.selected {
+            border-color: var(--success);
+            background: rgba(16,185,129,0.2);
+        }
+
+        .btn-buy {
+            width: 100%;
+            background: linear-gradient(95deg, var(--success), #059669);
+            padding: 1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            border: none;
+            margin-top: 0.5rem;
+        }
+
+        /* Tracker */
+        .tracker {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #0a0e18;
+            border-radius: 20px;
+        }
+
+        .tracker-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            opacity: 0.4;
+        }
+
+        .step.active {
+            opacity: 1;
+            color: var(--success);
+        }
+
+        /* Payment Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 32px;
+            max-width: 400px;
+            width: 90%;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--warning);
+            margin: 1rem 0;
+        }
+
+        /* Floating Chat */
+        .chat-floating {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 90;
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 300px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            display: none;
+            flex-direction: column;
+            z-index: 91;
+        }
+
+        .chat-box.active {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: 10px;
+            background: var(--accent);
+            border-radius: 20px 20px 0 0;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+            font-size: 0.8rem;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 8px;
+            gap: 8px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--success);
+            padding: 10px 20px;
+            border-radius: 40px;
+            z-index: 1100;
+            animation: fadeOut 3s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo"><i class="fas fa-gamepad"></i> GTopup+ Pro</div>
+    <div class="referral-badge" id="referralBtn"><i class="fas fa-gift"></i> Referral: Dapatkan 10%</div>
+</nav>
+
+<div class="hero">
+    <h1>Top Up <i class="fas fa-bolt"></i> Super Cepat</h1>
+    <p>16+ Game · Payment Gateway Simulasi · Real-time Tracker</p>
+</div>
+
+<div class="search-section">
+    <input type="text" id="searchInput" class="search-box" placeholder="Cari game...">
+    <button class="filter-btn active" data-cat="all">Semua</button>
+    <button class="filter-btn" data-cat="mobile">Mobile</button>
+    <button class="filter-btn" data-cat="pc">PC</button>
+</div>
+
+<div class="game-grid" id="gameGrid"></div>
+
+<div class="order-container">
+    <div class="form-group">
+        <label><i class="fas fa-gamepad"></i> Game</label>
+        <input type="text" id="selectedGameDisplay" readonly>
+    </div>
+    <div class="form-group">
+        <label><i class="fas fa-coins"></i> Nominal</label>
+        <select id="nominalSelect"></select>
+    </div>
+    <div class="form-group">
+        <label><i class="fas fa-id-card"></i> User ID</label>
+        <input type="text" id="userId" placeholder="Masukkan User ID">
+    </div>
+    <div class="form-group">
+        <label><i class="fab fa-whatsapp"></i> WhatsApp</label>
+        <input type="tel" id="waNumber" placeholder="08xxxxxxxxxx">
+    </div>
+
+    <!-- Live Order Tracker -->
+    <div class="tracker" id="tracker">
+        <div style="font-size:0.8rem;">📦 Status Pesanan</div>
+        <div class="tracker-steps">
+            <div class="step" id="step1">⏳ Menunggu</div>
+            <div class="step" id="step2">🔄 Memproses</div>
+            <div class="step" id="step3">✅ Sukses</div>
+        </div>
+    </div>
+
+    <div class="price-tag" id="priceDisplay">Total: Rp12.000</div>
+    
+    <label>💳 Metode Pembayaran</label>
+    <div class="pay-methods" id="payMethods">
+        <div class="pay-option" data-method="qris">QRIS</div>
+        <div class="pay-option" data-method="ovo">OVO</div>
+        <div class="pay-option" data-method="bca">BCA VA</div>
+    </div>
+
+    <button class="btn-buy" id="buyNowBtn"><i class="fas fa-bolt"></i> Lanjut ke Pembayaran</button>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <i class="fas fa-receipt" style="font-size: 3rem;"></i>
+        <h3>Selesaikan Pembayaran</h3>
+        <p id="modalMethod"></p>
+        <div class="countdown" id="countdown">05:00</div>
+        <button id="confirmPayBtn" style="background:#10b981; padding:10px; border-radius:40px; width:100%;">✅ Konfirmasi Pembayaran</button>
+        <button id="closePayModal" style="margin-top:10px;">Batal</button>
+    </div>
+</div>
+
+<!-- Referral Modal -->
+<div id="referralModal" class="modal">
+    <div class="modal-content">
+        <h3>🎁 Kode Referral</h3>
+        <p>Bagikan kode ini, teman dapat diskon 10%</p>
+        <div style="background:#1a1f30; padding:10px; border-radius:16px; margin:10px 0;" id="referralCode">GTUP-XXXX</div>
+        <button id="closeReferralBtn">Tutup</button>
+    </div>
+</div>
+
+<!-- Floating Chat Support -->
+<div class="chat-floating" id="chatToggle"><i class="fas fa-headset"></i></div>
+<div class="chat-box" id="chatBox">
+    <div class="chat-header">💬 CS GTopup</div>
+    <div class="chat-messages" id="chatMessages">
+        <div>🤖 CS: Halo! Ada yang bisa dibantu?</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Tanya sesuatu...">
+        <button id="chatSend"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script>
+    // GAME DATA
+    const gameLibrary = [
+        { id: "ml", name: "Mobile Legends", cat: "mobile", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/mobilelegends.svg" },
+        { id: "ff", name: "Free Fire", cat: "mobile", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/freefire.svg" },
+        { id: "pubg", name: "PUBG Mobile", cat: "mobile", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/pubg.svg" },
+        { id: "valorant", name: "Valorant", cat: "pc", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/valorant.svg" },
+        { id: "genshin", name: "Genshin Impact", cat: "pc", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/genshinimpact.svg" },
+        { id: "roblox", name: "Roblox", cat: "pc", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/roblox.svg" },
+        { id: "codm", name: "COD Mobile", cat: "mobile", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/callofduty.svg" },
+        { id: "coc", name: "Clash of Clans", cat: "mobile", icon: "https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/clashofclans.svg" }
+    ];
+
+    const gamePrices = {
+        ml: { "12":"50 Diamond", "28":"140 Diamond", "55":"285 Diamond", "99":"570 Diamond", "150":"1120 Diamond" },
+        ff: { "12":"100 UC", "28":"260 UC", "55":"560 UC", "99":"1120 UC", "150":"2100 UC" },
+        pubg: { "12":"60 UC", "28":"325 UC", "55":"660 UC", "99":"1425 UC", "150":"2800 UC" },
+        valorant: { "12":"125 VP", "28":"350 VP", "55":"700 VP", "99":"1575 VP", "150":"2450 VP" },
+        genshin: { "12":"60 Genesis", "28":"300 Genesis", "55":"980 Genesis", "99":"1980 Genesis", "150":"3280 Genesis" },
+        roblox: { "12":"120 Robux", "28":"500 Robux", "55":"1200 Robux", "99":"2500 Robux", "150":"5000 Robux" },
+        codm: { "12":"80 CP", "28":"400 CP", "55":"800 CP", "99":"1800 CP", "150":"3600 CP" },
+        coc: { "12":"1200 Gems", "28":"5000 Gems", "55":"12000 Gems", "99":"25000 Gems", "150":"50000 Gems" }
+    };
+
+    let currentGame = "ml";
+    let currentNominal = "12";
+    let currentPrice = 12000;
+    let selectedMethod = "qris";
+    let currentFilter = "all";
+    let searchQuery = "";
+    let countdownInterval;
+
+    // Referral system
+    let referralCode = localStorage.getItem("ref_code") || "GTUP-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+    localStorage.setItem("ref_code", referralCode);
+    let discount = 0;
+
+    function applyReferral() {
+        let params = new URLSearchParams(window.location.search);
+        let ref = params.get("ref");
+        if (ref && ref === referralCode) discount = 0.1;
+    }
+    applyReferral();
+
+    function updatePriceAndDesc() {
+        let price = parseInt(currentNominal);
+        if (discount > 0) price = Math.floor(price * (1 - discount));
+        currentPrice = price;
+        let descItem = gamePrices[currentGame]?.[currentNominal] || "Package";
+        document.getElementById("priceDisplay").innerHTML = `Total: Rp${price.toLocaleString('id-ID')} ${discount>0 ? '<span style="color:#f59e0b">(Diskon 10%)</span>' : ''}<br><small>${descItem}</small>`;
+        let selectElem = document.getElementById("nominalSelect");
+        let options = "";
+        ["12","28","55","99","150"].forEach(nom => {
+            let rupiah = parseInt(nom);
+            let finalPrice = discount > 0 ? Math.floor(rupiah * (1-discount)) : rupiah;
+            let label = gamePrices[currentGame]?.[nom] || "Topup";
+            options += `<option value="${nom}" ${nom==currentNominal ? "selected" : ""}>${label} - Rp${finalPrice.toLocaleString('id-ID')}</option>`;
+        });
+        selectElem.innerHTML = options;
+    }
+
+    function setGame(gameId) {
+        currentGame = gameId;
+        const game = gameLibrary.find(g => g.id === gameId);
+        document.getElementById("selectedGameDisplay").value = game ? game.name : "Game";
+        currentNominal = "12";
+        updatePriceAndDesc();
+        document.querySelectorAll('.game-card').forEach(card => {
+            if(card.getAttribute('data-game') === gameId) card.classList.add('active');
+            else card.classList.remove('active');
+        });
+    }
+
+    function renderGames() {
+        let filtered = gameLibrary.filter(g => {
+            if (currentFilter !== "all") return g.cat === currentFilter;
+            return true;
+        });
+        if (searchQuery) filtered = filtered.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        const container = document.getElementById("gameGrid");
+        container.innerHTML = "";
+        filtered.forEach(game => {
+            const card = document.createElement("div");
+            card.className = "game-card";
+            card.setAttribute("data-game", game.id);
+            card.innerHTML = `<img src="${game.icon}" onerror="this.src='https://placehold.co/50x50/3b82f6/white?text=${game.name.charAt(0)}'"><h3>${game.name}</h3>`;
+            card.onclick = () => setGame(game.id);
+            container.appendChild(card);
+        });
+        if (filtered.length > 0 && !document.querySelector(`.game-card[data-game="${currentGame}"]`)) setGame(filtered[0].id);
+    }
+
+    // Payment Simulation
+    function startPaymentSimulation() {
+        let timeLeft = 300;
+        const countdownEl = document.getElementById("countdown");
+        countdownInterval = setInterval(() => {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            countdownEl.innerText = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("confirmPayBtn").disabled = true;
+                alert("⏰ Waktu pembayaran habis!");
+                document.getElementById("paymentModal").classList.remove("active");
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function resetTracker() {
+        document.getElementById("step1").classList.remove("active");
+        document.getElementById("step2").classList.remove("active");
+        document.getElementById("step3").classList.remove("active");
+    }
+
+    function simulateOrderProcess() {
+        resetTracker();
+        document.getElementById("step1").classList.add("active");
+        setTimeout(() => {
+            document.getElementById("step2").classList.add("active");
+            setTimeout(() => {
+                document.getElementById("step3").classList.add("active");
+                canvasConfetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                showToast("🎉 Topup berhasil! Cek email/WA untuk konfirmasi.");
+            }, 2000);
+        }, 2000);
+    }
+
+    function showToast(msg) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Event Listeners
+    document.getElementById("searchInput").addEventListener("input", (e) => { searchQuery = e.target.value; renderGames(); });
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            currentFilter = btn.getAttribute("data-cat");
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderGames();
+        });
+    });
+    document.getElementById("nominalSelect").addEventListener("change", (e) => { currentNominal = e.target.value; updatePriceAndDesc(); });
+    document.querySelectorAll(".pay-option").forEach(opt => {
+        opt.addEventListener("click", () => {
+            selectedMethod = opt.getAttribute("data-method");
+            document.querySelectorAll(".pay-option").forEach(o => o.classList.remove("selected"));
+            opt.classList.add("selected");
+        });
+    });
+    document.querySelector(".pay-option").classList.add("selected");
+
+    // Buy
+    const buyBtn = document.getElementById("buyNowBtn");
+    const paymentModal = document.getElementById("paymentModal");
+    buyBtn.onclick = () => {
+        let userId = document.getElementById("userId").value.trim();
+        let wa = document.getElementById("waNumber").value.trim();
+        if (!userId) { alert("Masukkan User ID!"); return; }
+        if (!wa) { alert("Masukkan WhatsApp!"); return; }
+        document.getElementById("modalMethod").innerHTML = `Metode: ${selectedMethod.toUpperCase()} <br> Total: Rp${currentPrice.toLocaleString('id-ID')}`;
+        paymentModal.classList.add("active");
+        startPaymentSimulation();
+    };
+
+    document.getElementById("confirmPayBtn").onclick = () => {
+        clearInterval(countdownInterval);
+        paymentModal.classList.remove("active");
+        simulateOrderProcess();
+        let gameName = gameLibrary.find(g=>g.id===currentGame).name;
+        showToast(`✅ Pembayaran diterima! Topup ${gameName} sedang diproses.`);
+        // Reset tracker otomatis next order
+    };
+    document.getElementById("closePayModal").onclick = () => {
+        clearInterval(countdownInterval);
+        paymentModal.classList.remove("active");
+    };
+
+    // Referral
+    document.getElementById("referralBtn").onclick = () => {
+        document.getElementById("referralCode").innerText = referralCode;
+        document.getElementById("referralModal").classList.add("active");
+    };
+    document.getElementById("closeReferralBtn").onclick = () => document.getElementById("referralModal").classList.remove("active");
+
+    // Floating Chat
+    const chatToggle = document.getElementById("chatToggle");
+    const chatBox = document.getElementById("chatBox");
+    chatToggle.onclick = () => chatBox.classList.toggle("active");
+    document.getElementById("chatSend").onclick = () => {
+        let input = document.getElementById("chatInput");
+        let msg = input.value.trim();
+        if (!msg) return;
+        let msgsDiv = document.getElementById("chatMessages");
+        msgsDiv.innerHTML += `<div style="text-align:right">🧑: ${msg}</div>`;
+        input.value = "";
+        setTimeout(() => {
+            msgsDiv.innerHTML += `<div>🤖 CS: Terima kasih! Pesanan akan diproses maksimal 5 menit.</div>`;
+            msgsDiv.scrollTop = msgsDiv.scrollHeight;
+        }, 1000);
+    };
+
+    renderGames();
+    setGame("ml");
+    document.querySelector(".pay-option").click(); // default method selected
+</script>
+</body>
+</html>
